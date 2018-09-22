@@ -46,7 +46,7 @@ import qualified Data.Map        as M
 -- The preferred terminal program, which is used in a binding below and by
 -- certain contrib modules.
 --
-myTerminal = "termite"
+myTerminal = "konsole"
 
 -- The command to lock the screen or show the screensaver.
 myScreensaver = "dm-tool switch-to-greeter"
@@ -62,13 +62,13 @@ myScreenshot = "xfce4-screenshooter"
 -- preset keybindings.
 myLauncher = "rofi -show"
 
-
+myRunLauncher = "rofi -show run"
 
 ------------------------------------------------------------------------
 -- Workspaces
 -- The default number of workspaces (virtual screens) and their names.
 --
-myWorkspaces = ["1: term","2: web","3: code","4: media"] ++ map show [5..9]
+myWorkspaces = ["1: term","2: web","3: code","4: external", "5: monitor"] ++ map show [5..9]
 
 
 ------------------------------------------------------------------------
@@ -87,7 +87,7 @@ myWorkspaces = ["1: term","2: web","3: code","4: media"] ++ map show [5..9]
 --
 myManageHook = composeAll
     [
-      className =? "Google-chrome"                --> doShift "2:web"
+      className =? "chromium"                --> doShift "2:web"
     , resource  =? "desktop_window"               --> doIgnore
     , className =? "Galculator"                   --> doCenterFloat
     , className =? "Steam"                        --> doCenterFloat
@@ -116,7 +116,7 @@ myManageHook = composeAll
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 
-outerGaps    = 10
+outerGaps    = 1
 myGaps       = gaps [(U, outerGaps), (R, outerGaps), (L, outerGaps), (D, outerGaps)]
 addSpace     = renamed [CutWordsLeft 2] . spacing gap
 tab          =  avoidStruts
@@ -173,7 +173,7 @@ xmobarTitleColor = "#C678DD"
 xmobarCurrentWorkspaceColor = "#51AFEF"
 
 -- Width of the window border in pixels.
-myBorderWidth = 0
+myBorderWidth = 1
 
 myNormalBorderColor     = "#000000"
 myFocusedBorderColor    = active
@@ -196,11 +196,11 @@ cyan    = "#2aa198"
 green   = "#859900"
 
 -- sizes
-gap         = 10
+gap         = 0
 topbar      = 10
 border      = 0
-prompt      = 20
-status      = 20
+prompt      = 10
+status      = 10
 
 active      = blue
 activeWarn  = red
@@ -210,8 +210,8 @@ unfocusColor = base02
 
 -- myFont      = "-*-Zekton-medium-*-*-*-*-160-*-*-*-*-*-*"
 -- myBigFont   = "-*-Zekton-medium-*-*-*-*-240-*-*-*-*-*-*"
-myFont      = "xft:Zekton:size=9:bold:antialias=true"
-myBigFont   = "xft:Zekton:size=9:bold:antialias=true"
+myFont      = "xft:Zekton:size=12:bold:antialias=true"
+myBigFont   = "xft:Zekton:size=12:bold:antialias=true"
 myWideFont  = "xft:Eurostar Black Extended:"
             ++ "style=Regular:pixelsize=180:hinting=true"
 
@@ -272,6 +272,9 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
   , ((modMask, xK_p),
      spawn myLauncher)
 
+  , ((modMask, xK_o),
+     spawn myRunLauncher)
+
   -- Take a selective screenshot using the command specified by mySelectScreenshot.
   , ((modMask .|. shiftMask, xK_p),
      spawn mySelectScreenshot)
@@ -285,15 +288,23 @@ myKeys conf@(XConfig {XMonad.modMask = modMask}) = M.fromList $
 
   -- Mute volume.
   , ((0, xF86XK_AudioMute),
-     spawn "amixer -q set Master toggle")
+     spawn "pamixer -m")
 
   -- Decrease volume.
   , ((0, xF86XK_AudioLowerVolume),
-     spawn "amixer -q set Master 5%-")
+     spawn "pamixer -d 10")
 
   -- Increase volume.
   , ((0, xF86XK_AudioRaiseVolume),
-     spawn "amixer -q set Master 5%+")
+     spawn "pamixer -i 10")
+
+  -- Increase brightness.
+  , ((0, xF86XK_MonBrightnessUp),
+     spawn "xbacklight -inc 2")
+
+  -- Decreaase brightness.
+  , ((0, xF86XK_MonBrightnessDown),
+     spawn "xbacklight -dec 2")
 
   -- Audio previous.
   , ((0, 0x1008FF16),
